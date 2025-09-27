@@ -1,0 +1,260 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Updated to new graphite + muted phosphor design tokens */
+  --bg: #0e0f13;
+  --surface: #14161c;
+  --muted: #1b1e27;
+  --border: #232735;
+  --grid: #263042;
+  --text: #e8f0ff;
+  --text-dim: #9aa8bc;
+  --accent-up: #2bd576;
+  --accent-down: #ff5c5c;
+  --accent-warn: #ffb84d;
+  --accent-danger: #ff3d00;
+  --accent-info: #5bc0eb;
+  --accent-success: #29d398;
+  --chart-line: #8ff7a7;
+  --chart-glow: rgba(143, 247, 167, 0.25);
+  --focus: #7aa2f7;
+
+  /* Shadcn compatibility tokens */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--accent-up);
+  --primary-foreground: var(--bg);
+  --secondary: var(--muted);
+  --secondary-foreground: var(--text);
+  --muted-bg: var(--muted);
+  --muted-foreground: var(--text-dim);
+  --accent: var(--accent-info);
+  --accent-foreground: var(--bg);
+  --destructive: var(--accent-down);
+  --destructive-foreground: var(--bg);
+  --input: var(--surface);
+  --ring: var(--focus);
+  --chart-1: var(--accent-up);
+  --chart-2: var(--accent-down);
+  --chart-3: var(--accent-warn);
+  --chart-4: var(--accent-info);
+  --chart-5: var(--accent-success);
+  --radius: 0.375rem;
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--accent-up);
+  --sidebar-primary-foreground: var(--bg);
+  --sidebar-accent: var(--muted);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--focus);
+}
+
+@theme inline {
+  --font-mono: "IBM Plex Mono", "Courier New", monospace;
+
+  /* Updated color tokens to use new palette */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-grid: var(--grid);
+  --color-text: var(--text);
+  --color-text-dim: var(--text-dim);
+  --color-accent-up: var(--accent-up);
+  --color-accent-down: var(--accent-down);
+  --color-accent-warn: var(--accent-warn);
+  --color-accent-danger: var(--accent-danger);
+  --color-accent-info: var(--accent-info);
+  --color-accent-success: var(--accent-success);
+  --color-chart-line: var(--chart-line);
+  --color-chart-glow: var(--chart-glow);
+  --color-focus: var(--focus);
+
+  /* Semantic Design Tokens */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted-bg: var(--muted-bg);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Updated CRT Terminal Effects with subtle styling */
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  overflow-x: hidden;
+}
+
+/* Subtle scanlines overlay at 4% opacity */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(143, 247, 167, 0.04) 2px,
+    rgba(143, 247, 167, 0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Subtle terminal glow effects (2-4% opacity) */
+.terminal-glow {
+  text-shadow: 0 0 3px currentColor;
+}
+
+.terminal-border {
+  border: 1px solid var(--color-border);
+  box-shadow: 0 0 24px rgba(124, 255, 107, 0.04) inset;
+}
+
+.terminal-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 0 24px rgba(124, 255, 107, 0.04) inset;
+}
+
+.terminal-panel-chart {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 0 24px rgba(124, 255, 107, 0.04) inset;
+  overflow: hidden;
+  position: relative;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Updated keycap button style with new colors */
+.keycap-button {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  box-shadow: 0 2px 0 var(--color-border);
+  transform: translateY(0);
+  transition: all 0.1s ease;
+}
+
+.keycap-button:hover {
+  background: var(--color-muted);
+  box-shadow: 0 2px 0 var(--color-border);
+}
+
+.keycap-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--color-border);
+}
+
+.keycap-button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Updated oscilloscope grid with muted colors */
+.oscilloscope-grid {
+  background-image: linear-gradient(rgba(38, 48, 66, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(38, 48, 66, 0.3) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Ticker animation */
+.ticker-scroll {
+  animation: scroll-left 60s linear infinite;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Terminal cursor blink */
+.terminal-cursor {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Updated scrollbar with new colors */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-chart-line);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

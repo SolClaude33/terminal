@@ -10,9 +10,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "WALL•ST BET TERMINAL v1.9 (1987)",
-  description: "Retro Wall Street betting terminal",
-    generator: 'v0.app'
+  title: "SolPrediction",
+  description: "Predict Solana token price movements with our advanced betting terminal. Real-time predictions, 1.95x multiplier, synchronized rounds.",
+  keywords: ["Solana", "crypto", "predictions", "betting", "trading", "DeFi"]
 }
 
 export default function RootLayout({

@@ -4,6 +4,12 @@ import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
+interface PublicBetsTableProps {
+  currentPrice?: number
+  entryPrice?: number | null
+  betPrice?: number | null
+}
+
 interface PublicBet {
   id: string
   player: string
@@ -34,14 +40,15 @@ const DEMO_PLAYERS = [
   "RETAIL_HERO",
 ]
 
-function generateDemoBets(): PublicBet[] {
+function generateDemoBets(currentPrice: number = 213, entryPrice: number | null = null, betPrice: number | null = null): PublicBet[] {
   const bets: PublicBet[] = []
   const now = Date.now()
 
   for (let i = 0; i < 15; i++) {
     const isSettled = Math.random() > 0.3
     const direction = Math.random() > 0.5 ? "up" : "down"
-    const entry = 725 + Math.random() * 20
+    // Use real prices when available, otherwise use current price with small variation
+    const entry = entryPrice || (currentPrice + (Math.random() - 0.5) * 2)
     const stake = Math.floor(Math.random() * 900) + 100
     const volatility = ["low", "medium", "high"][Math.floor(Math.random() * 3)] as "low" | "medium" | "high"
 
@@ -49,17 +56,15 @@ function generateDemoBets(): PublicBet[] {
     let pnl: number | null = null
     let roi: number | null = null
     let status: "pending" | "won" | "lost" = "pending"
-    let multiplier = 1.9
+    const multiplier = 1.95 // Fixed multiplier
 
     if (isSettled) {
-      exit = entry + (Math.random() - 0.5) * 10
+      // Use bet price when available, otherwise simulate small price movement
+      exit = betPrice || (entry + (Math.random() - 0.5) * 2)
       const priceChange = exit - entry
       const isWin = (direction === "up" && priceChange > 0) || (direction === "down" && priceChange < 0)
 
       if (isWin) {
-        const percentChange = Math.abs(priceChange / entry)
-        const marginBonus = Math.min(Math.floor(percentChange / 0.0005) * 0.1, 3.1)
-        multiplier = Math.min(1.9 + marginBonus, 5.0)
         pnl = stake * multiplier - stake
         roi = (pnl / stake) * 100
         status = "won"
@@ -67,7 +72,6 @@ function generateDemoBets(): PublicBet[] {
         pnl = -stake
         roi = -100
         status = "lost"
-        multiplier = 0
       }
     }
 
@@ -90,18 +94,18 @@ function generateDemoBets(): PublicBet[] {
   return bets.sort((a, b) => b.timestamp - a.timestamp)
 }
 
-export default function PublicBetsTable() {
+export default function PublicBetsTable({ currentPrice = 213, entryPrice = null, betPrice = null }: PublicBetsTableProps) {
   const [bets, setBets] = useState<PublicBet[]>([])
   const [showDetails, setShowDetails] = useState<string | null>(null)
 
   useEffect(() => {
-    // Initialize with demo data
-    setBets(generateDemoBets())
+    // Initialize with demo data using real prices
+    setBets(generateDemoBets(currentPrice, entryPrice, betPrice))
 
     // Add new demo bets periodically
     const interval = setInterval(() => {
       setBets((prev) => {
-        const newBet = generateDemoBets()[0]
+        const newBet = generateDemoBets(currentPrice, entryPrice, betPrice)[0]
         newBet.id = `bet_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
         newBet.timestamp = Date.now()
         return [newBet, ...prev.slice(0, 14)] // Keep only 15 most recent
@@ -109,7 +113,7 @@ export default function PublicBetsTable() {
     }, 10000) // New bet every 10 seconds
 
     return () => clearInterval(interval)
-  }, [])
+  }, [currentPrice, entryPrice, betPrice])
 
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp)
@@ -191,13 +195,13 @@ export default function PublicBetsTable() {
                 <td className="p-2 font-bold">{bet.player}</td>
                 <td className="p-2">{getDirectionBadge(bet.direction)}</td>
                 <td className="p-2 text-right">${formatCurrency(bet.entry)}</td>
-                <td className="p-2 text-right">{bet.stake} cr</td>
+                <td className="p-2 text-right">{bet.stake} $Prediction</td>
                 <td className="p-2 text-right">{bet.multiplier.toFixed(1)}×</td>
                 <td className="p-2 text-right">{bet.exit ? `$${formatCurrency(bet.exit)}` : "-"}</td>
                 <td
                   className={`p-2 text-right font-bold ${bet.pnl === null ? "" : bet.pnl >= 0 ? "text-primary" : "text-destructive"}`}
                 >
-                  {bet.pnl === null ? "-" : `${bet.pnl >= 0 ? "+" : ""}${formatCurrency(bet.pnl)} cr`}
+                  {bet.pnl === null ? "-" : `${bet.pnl >= 0 ? "+" : ""}${formatCurrency(bet.pnl)} $Prediction`}
                 </td>
                 <td
                   className={`p-2 text-right font-bold ${bet.roi === null ? "" : bet.roi >= 0 ? "text-primary" : "text-destructive"}`}
@@ -244,7 +248,7 @@ export default function PublicBetsTable() {
                   </div>
                   <div>
                     <span className="text-muted-foreground">Stake Amount:</span>
-                    <div className="font-bold">{bet.stake} cr</div>
+                    <div className="font-bold">{bet.stake} $Prediction</div>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Multiplier:</span>
@@ -266,7 +270,7 @@ export default function PublicBetsTable() {
                         <span className="text-muted-foreground">Final P&L:</span>
                         <div className={`font-bold ${bet.pnl! >= 0 ? "text-primary" : "text-destructive"}`}>
                           {bet.pnl! >= 0 ? "+" : ""}
-                          {formatCurrency(bet.pnl!)} cr
+                          {formatCurrency(bet.pnl!)} $Prediction
                         </div>
                       </div>
                       <div>

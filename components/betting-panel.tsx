@@ -48,7 +48,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
     multiplier: 0,
     isActive: false,
   })
-  const [balance, setBalance] = useState(10000000) // Demo balance in credits (10M)
+  const [balance, setBalance] = useState(10000000) // Demo balance in $Prediction (10M)
   const [currentPrice, setCurrentPrice] = useState(propCurrentPrice) // Real SOL price from parent
   const [solanaData, setSolanaData] = useState<SolanaPriceData | null>(null)
   const [isLocked, setIsLocked] = useState(false)
@@ -90,9 +90,9 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
         if (didWin) {
           const winAmount = currentBet.stake * 1.95 // 1.95x multiplier
           setBalance(prev => prev + winAmount)
-          console.log(`[BET RESULT] WIN! +${winAmount.toLocaleString()} credits (1.95x multiplier)`)
+          console.log(`[BET RESULT] WIN! +${winAmount.toLocaleString()} $Prediction (1.95x multiplier)`)
         } else {
-          console.log(`[BET RESULT] LOSS! -${currentBet.stake.toLocaleString()} credits`)
+          console.log(`[BET RESULT] LOSS! -${currentBet.stake.toLocaleString()} $Prediction`)
         }
         
         // Clear the result after 5 seconds
@@ -237,7 +237,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
   const estimatedPayout = 1.95 * stake
 
   return (
-    <div className="terminal-panel p-4 space-y-4" style={{ height: "600px", minHeight: "600px" }}>
+    <div className="terminal-panel p-3 space-y-3" style={{ height: "600px", minHeight: "600px" }}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -259,12 +259,12 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
       </div>
 
       {/* Primary Betting Buttons */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         <div className="grid grid-cols-2 gap-3">
           <Button
             onClick={() => handlePlaceBet("up")}
             disabled={isLocked || currentBet.isActive || stake > balance}
-            className={`keycap-button h-12 font-bold text-lg flex items-center justify-center gap-2 ${
+            className={`keycap-button h-10 font-bold text-base flex items-center justify-center gap-2 ${
               currentBet.direction === "up"
                 ? "bg-[var(--color-accent-up)] text-[var(--color-bg)] border-[var(--color-accent-up)]"
                 : isLocked || currentBet.isActive || stake > balance
@@ -285,7 +285,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
           <Button
             onClick={() => handlePlaceBet("down")}
             disabled={isLocked || currentBet.isActive || stake > balance}
-            className={`keycap-button h-12 font-bold text-lg flex items-center justify-center gap-2 ${
+            className={`keycap-button h-10 font-bold text-base flex items-center justify-center gap-2 ${
               currentBet.direction === "down"
                 ? "bg-[var(--color-accent-down)] text-[var(--color-bg)] border-[var(--color-accent-down)]"
                 : isLocked || currentBet.isActive || stake > balance
@@ -306,10 +306,10 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
         </div>
 
         {currentBet.isActive && (
-          <Button 
+          <Button
             onClick={handleCancelBet} 
             variant="outline" 
-            className={`w-full keycap-button ${
+            className={`w-full keycap-button h-8 text-sm ${
               isLocked 
                 ? "bg-[#2A2F3A] text-[#6B7280] border-[var(--color-border)] cursor-not-allowed" 
                 : "bg-transparent"
@@ -322,11 +322,11 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
       </div>
 
       {/* Stake Controls */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label className="text-sm font-bold">STAKE (cr)</Label>
+          <Label className="text-sm font-bold">STAKE ($Prediction)</Label>
           <span className="text-xs" style={{ color: "var(--color-text-dim)" }}>
-            Balance: {balance.toLocaleString()} cr
+            Balance: {balance.toLocaleString()} $Prediction
           </span>
         </div>
 
@@ -361,7 +361,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
                 onClick={() => setStake(Math.min(amount, balance))}
                 variant="outline"
                 size="sm"
-                className="flex-1 text-xs keycap-button"
+                className="flex-1 text-xs keycap-button h-7"
                 disabled={amount > balance}
               >
                 {amount.toLocaleString()}
@@ -382,7 +382,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
           <div>
             <span style={{ color: "var(--color-text-dim)" }}>Est. Payout:</span>
             <div className="font-bold" style={{ color: "var(--color-accent-up)" }}>
-              {estimatedPayout.toLocaleString()} cr
+              {estimatedPayout.toLocaleString()} $Prediction
             </div>
           </div>
         </div>
@@ -413,14 +413,14 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
             </div>
             <div>
               <span style={{ color: "var(--color-text-dim)" }}>Stake:</span>
-              <div className="font-bold">{lastBetResult.stake.toLocaleString()} cr</div>
+              <div className="font-bold">{lastBetResult.stake.toLocaleString()} $Prediction</div>
             </div>
             <div>
               <span style={{ color: "var(--color-text-dim)" }}>Result:</span>
               <div className={`font-bold ${lastBetResult.won ? 'text-green-400' : 'text-red-400'}`}>
                 {lastBetResult.won 
-                  ? `+${lastBetResult.winAmount!.toLocaleString()} cr (1.95x)`
-                  : `-${lastBetResult.stake.toLocaleString()} cr`
+                  ? `+${lastBetResult.winAmount!.toLocaleString()} $Prediction (1.95x)`
+                  : `-${lastBetResult.stake.toLocaleString()} $Prediction`
                 }
               </div>
             </div>
@@ -452,7 +452,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
             </div>
             <div>
               <span style={{ color: "var(--color-text-dim)" }}>Stake:</span>
-              <div className="font-bold">{currentBet.stake.toLocaleString()} cr</div>
+              <div className="font-bold">{currentBet.stake.toLocaleString()} $Prediction</div>
             </div>
             <div>
               <span style={{ color: "var(--color-text-dim)" }}>Status:</span>

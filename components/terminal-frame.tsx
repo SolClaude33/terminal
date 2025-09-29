@@ -287,7 +287,11 @@ export default function TerminalFrame() {
 
         {/* Public Bets Table */}
         <div className="mb-4">
-          <PublicBetsTable />
+          <PublicBetsTable 
+            currentPrice={currentPrice} 
+            entryPrice={entryPrice} 
+            betPrice={betPrice} 
+          />
         </div>
       </main>
 

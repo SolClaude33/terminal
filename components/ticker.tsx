@@ -67,41 +67,36 @@ export default function Ticker() {
 
   return (
     <div className="terminal-panel border-t bg-background">
-      {/* Market Headlines */}
-      <div className="border-b border-border p-2">
-        <div className="ticker-scroll text-sm font-bold terminal-glow">MARKET UPDATE: {headlines[currentHeadline]}</div>
-      </div>
 
-      {/* Market Data Ticker */}
-      <div className="p-2 overflow-hidden">
-        <div className="ticker-scroll flex gap-8 text-xs">
-          {tickerData.map((item) => (
-            <div key={item.symbol} className="flex items-center gap-2 whitespace-nowrap">
-              <span className="font-bold">{item.symbol}</span>
-              <span>${item.price.toFixed(2)}</span>
-              <span className={`font-bold ${item.change >= 0 ? "text-primary" : "text-destructive"}`}>
-                {item.change >= 0 ? "+" : ""}
-                {item.change.toFixed(2)} ({item.changePercent >= 0 ? "+" : ""}
-                {item.changePercent.toFixed(1)}%)
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Footer Legal */}
-      <div className="border-t border-border p-2 space-y-2">
-        <div className="text-xs text-muted-foreground">
-          Demo betting platform for educational/entertainment purposes. No real money involved in this version. Please
-          bet responsibly.
-        </div>
-
-        <div className="flex flex-wrap gap-4 text-xs">
-          <TermsModal />
-          <PrivacyModal />
-          <ResponsibleBettingModal />
-          <span className="text-muted-foreground">|</span>
-          <span className="text-muted-foreground">This is a product demo. Not financial advice.</span>
+      {/* Social Media Links */}
+      <div className="border-t border-border p-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Follow us:</span>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <a 
+              href="#" 
+              className="terminal-glow hover:text-primary transition-colors duration-200"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Twitter
+            </a>
+            
+            <a 
+              href="#" 
+              className="terminal-glow hover:text-primary transition-colors duration-200"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              PumpFun
+            </a>
+            
+            <span className="text-muted-foreground">CA: Soon</span>
+          </div>
         </div>
       </div>
     </div>

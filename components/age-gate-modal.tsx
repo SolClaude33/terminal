@@ -13,8 +13,7 @@ export default function AgeGateModal({ onConfirm }: AgeGateModalProps) {
         <div className="terminal-glow text-xl font-bold mb-6">AGE VERIFICATION REQUIRED</div>
 
         <div className="text-sm mb-6 space-y-2">
-          <p>You must be 18 years or older to access this betting terminal.</p>
-          <p className="text-muted-foreground">This is a product demo for educational/entertainment purposes only.</p>
+          <p>You must be 18 years or older to access this prediction platform.</p>
         </div>
 
         <div className="space-y-4">
@@ -23,7 +22,7 @@ export default function AgeGateModal({ onConfirm }: AgeGateModalProps) {
           </Button>
 
           <div className="text-xs text-muted-foreground">
-            By entering, you acknowledge this is a demonstration platform. No real money is involved in this version.
+            By entering, you acknowledge the terms and conditions of SolPrediction.
           </div>
         </div>
       </div>

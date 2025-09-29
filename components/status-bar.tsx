@@ -35,7 +35,7 @@ export default function StatusBar({ currentTime, roundTimeLeft, roundPhase, roun
   return (
     <div className="terminal-panel px-4 py-2 border-b">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <div className="terminal-glow text-sm font-bold">WALL•ST BET TERMINAL v1.9 (1987)</div>
+        <div className="terminal-glow text-sm font-bold">SolPrediction</div>
 
         <div className="flex flex-col sm:flex-row gap-4 text-xs">
           <div className="flex items-center gap-2">
@@ -58,7 +58,7 @@ export default function StatusBar({ currentTime, roundTimeLeft, roundPhase, roun
 
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">TIME LEFT:</span>
-            <span className={`terminal-glow font-bold ${roundTimeLeft <= 10 ? "text-destructive" : "text-secondary"}`}>
+            <span className={`terminal-glow font-bold ${roundTimeLeft <= 10 ? "text-destructive" : "text-green-400"}`}>
               {formatRoundTime(roundTimeLeft)}
             </span>
           </div>

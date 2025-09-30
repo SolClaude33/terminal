@@ -43,7 +43,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
   const { connected } = useWallet()
   const { placeBet, claimWinnings, isLoading: isBettingLoading, error: bettingError } = useMemecoinBetting()
   
-  const [stake, setStake] = useState(100000)
+  const [stake, setStake] = useState(100)
   const [currentBet, setCurrentBet] = useState<BetState>({
     direction: null,
     stake: 0,
@@ -53,7 +53,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
     multiplier: 0,
     isActive: false,
   })
-  const [balance, setBalance] = useState(10) // Demo balance in SOL
+  const [balance, setBalance] = useState(1000) // Demo balance in $PREDICTION
   const [currentPrice, setCurrentPrice] = useState(propCurrentPrice) // Real SOL price from parent
   const [solanaData, setSolanaData] = useState<SolanaPriceData | null>(null)
   const [isLocked, setIsLocked] = useState(false)
@@ -276,7 +276,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
         </div>
         <div className="text-right">
           <div className="text-sm font-bold terminal-glow">
-            Balance: {balance.toLocaleString()} SOL
+            Balance: {balance.toLocaleString()} $PREDICTION
           </div>
         </div>
       </div>
@@ -357,28 +357,28 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
           <Input
             type="number"
             value={stake}
-            onChange={(e) => setStake(Math.max(1000, Number.parseInt(e.target.value) || 1000))}
+            onChange={(e) => setStake(Math.max(10, Number.parseInt(e.target.value) || 10))}
             className="terminal-border font-mono"
             style={{
               backgroundColor: "var(--color-surface)",
               color: "var(--color-text)",
               borderColor: "var(--color-border)",
             }}
-            min="1000"
+            min="10"
             max={balance}
           />
 
           <Slider
             value={[stake]}
             onValueChange={([value]) => setStake(value)}
-            max={Math.min(balance, 1000000)}
-            min={1000}
-            step={10000}
+            max={Math.min(balance, 1000)}
+            min={10}
+            step={10}
             className="w-full"
           />
 
           <div className="flex gap-1">
-            {[25000, 50000, 100000, 250000, 500000].map((amount) => (
+            {[50, 100, 250, 500, 1000].map((amount) => (
               <Button
                 key={amount}
                 onClick={() => setStake(Math.min(amount, balance))}
@@ -475,7 +475,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
             </div>
             <div>
               <span style={{ color: "var(--color-text-dim)" }}>Stake:</span>
-              <div className="font-bold">{currentBet.stake.toLocaleString()} SOL</div>
+              <div className="font-bold">{currentBet.stake.toLocaleString()} $PREDICTION</div>
             </div>
             <div>
               <span style={{ color: "var(--color-text-dim)" }}>Status:</span>

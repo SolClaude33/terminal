@@ -78,7 +78,7 @@ export default function Ticker() {
           
           <div className="flex items-center gap-4">
             <a 
-              href="#" 
+              href="https://x.com/PredictionSol" 
               className="terminal-glow hover:text-primary transition-colors duration-200"
               target="_blank"
               rel="noopener noreferrer"
@@ -87,7 +87,7 @@ export default function Ticker() {
             </a>
             
             <a 
-              href="#" 
+              href="https://pump.fun/board" 
               className="terminal-glow hover:text-primary transition-colors duration-200"
               target="_blank"
               rel="noopener noreferrer"

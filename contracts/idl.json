@@ -1,0 +1,371 @@
+{
+  "version": "0.1.0",
+  "name": "prediction_betting",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [
+        {
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createRound",
+      "accounts": [
+        {
+          "name": "round",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "roundId",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "placeBet",
+      "accounts": [
+        {
+          "name": "round",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "bet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "bettor",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "direction",
+          "type": {
+            "defined": "BetDirection"
+          }
+        }
+      ]
+    },
+    {
+      "name": "resolveRound",
+      "accounts": [
+        {
+          "name": "round",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "finalPrice",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "claimWinnings",
+      "accounts": [
+        {
+          "name": "bet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "round",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "bettor",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "ProgramState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "treasury",
+            "type": "publicKey"
+          },
+          {
+            "name": "currentRound",
+            "type": "u64"
+          },
+          {
+            "name": "totalVolume",
+            "type": "u64"
+          },
+          {
+            "name": "houseFeePercentage",
+            "type": "u8"
+          },
+          {
+            "name": "isActive",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BettingRound",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "roundId",
+            "type": "u64"
+          },
+          {
+            "name": "entryPrice",
+            "type": "u64"
+          },
+          {
+            "name": "betPrice",
+            "type": "u64"
+          },
+          {
+            "name": "startTime",
+            "type": "i64"
+          },
+          {
+            "name": "bettingEndTime",
+            "type": "i64"
+          },
+          {
+            "name": "resolutionTime",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": "RoundStatus"
+            }
+          },
+          {
+            "name": "totalUpBets",
+            "type": "u64"
+          },
+          {
+            "name": "totalDownBets",
+            "type": "u64"
+          },
+          {
+            "name": "winner",
+            "type": {
+              "option": {
+                "defined": "BetDirection"
+              }
+            }
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Bet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bettor",
+            "type": "publicKey"
+          },
+          {
+            "name": "roundId",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "direction",
+            "type": {
+              "defined": "BetDirection"
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "claimed",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "BetDirection",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Up"
+          },
+          {
+            "name": "Down"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RoundStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Waiting"
+          },
+          {
+            "name": "Betting"
+          },
+          {
+            "name": "Resolved"
+          },
+          {
+            "name": "Cancelled"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "RoundNotActive",
+      "msg": "Round is not active"
+    },
+    {
+      "code": 6001,
+      "name": "BettingPeriodEnded",
+      "msg": "Betting period has ended"
+    },
+    {
+      "code": 6002,
+      "name": "RoundAlreadyResolved",
+      "msg": "Round already resolved"
+    },
+    {
+      "code": 6003,
+      "name": "TooEarlyToResolve",
+      "msg": "Too early to resolve"
+    },
+    {
+      "code": 6004,
+      "name": "RoundNotResolved",
+      "msg": "Round not resolved"
+    },
+    {
+      "code": 6005,
+      "name": "NotAWinner",
+      "msg": "Not a winner"
+    },
+    {
+      "code": 6006,
+      "name": "AlreadyClaimed",
+      "msg": "Already claimed"
+    },
+    {
+      "code": 6007,
+      "name": "InsufficientBalance",
+      "msg": "Insufficient balance"
+    },
+    {
+      "code": 6008,
+      "name": "Unauthorized",
+      "msg": "Unauthorized"
+    }
+  ]
+}

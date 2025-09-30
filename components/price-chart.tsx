@@ -36,8 +36,12 @@ export default function PriceChart({ roundTimeLeft, roundPhase, onPriceUpdate, o
         const solData = await SolanaAPI.getSolanaPriceData()
         setSolanaData(solData)
         setCurrentPrice(solData.price)
-        onPriceUpdate(solData.price) // Report price to parent
-        onChartPriceUpdate(solData.price) // Report chart price to parent
+        
+        // Use setTimeout to avoid setState during render
+        setTimeout(() => {
+          onPriceUpdate(solData.price) // Report price to parent
+          onChartPriceUpdate(solData.price) // Report chart price to parent
+        }, 0)
         
         // Initialize with real 24h change data
         setPriceChange(solData.priceChange24h)
@@ -77,10 +81,10 @@ export default function PriceChart({ roundTimeLeft, roundPhase, onPriceUpdate, o
           const newData = [...prev, newPoint].slice(-60)
 
           setCurrentPrice(solData.price)
-          onPriceUpdate(solData.price) // Report price to parent
           
           // Use setTimeout to avoid setState during render
           setTimeout(() => {
+            onPriceUpdate(solData.price) // Report price to parent
             onChartPriceUpdate(solData.price)
           }, 0)
           

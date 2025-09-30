@@ -8,6 +8,8 @@ import { Switch } from "@/components/ui/switch"
 import { Slider } from "@/components/ui/slider"
 import { calculatePayout } from "@/lib/market-simulation"
 import { SolanaAPI, type SolanaPriceData } from "@/lib/solana-api"
+import { useMemecoinBetting } from "@/hooks/use-memecoin-betting"
+import { useWallet } from '@solana/wallet-adapter-react'
 
 interface BettingPanelProps {
   roundTimeLeft: number
@@ -38,6 +40,9 @@ interface BetState {
 }
 
 export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, entryPrice, betPrice, currentPrice: propCurrentPrice, currentRoundEntryPrice, lastRoundEntryPrice, roundHistory }: BettingPanelProps) {
+  const { connected } = useWallet()
+  const { placeBet, claimWinnings, isLoading: isBettingLoading, error: bettingError } = useMemecoinBetting()
+  
   const [stake, setStake] = useState(100000)
   const [currentBet, setCurrentBet] = useState<BetState>({
     direction: null,
@@ -48,7 +53,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
     multiplier: 0,
     isActive: false,
   })
-  const [balance, setBalance] = useState(10000000) // Demo balance in $Prediction (10M)
+  const [balance, setBalance] = useState(10) // Demo balance in SOL
   const [currentPrice, setCurrentPrice] = useState(propCurrentPrice) // Real SOL price from parent
   const [solanaData, setSolanaData] = useState<SolanaPriceData | null>(null)
   const [isLocked, setIsLocked] = useState(false)
@@ -59,6 +64,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
     roundResult: 'up' | 'down'
     winAmount?: number
   } | null>(null)
+  const [transactionHash, setTransactionHash] = useState<string | null>(null)
 
   const [lastResetRound, setLastResetRound] = useState(roundNumber)
 
@@ -66,6 +72,8 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
     // Lock betting during betting phase (waiting for results) or in final 5 seconds of waiting phase (betting phase)
     const shouldLock = roundPhase === 'betting' || (roundPhase === 'waiting' && roundTimeLeft <= 5)
     setIsLocked(shouldLock)
+    
+    console.log(`[LOCK STATUS] roundPhase: ${roundPhase}, timeLeft: ${roundTimeLeft}s, shouldLock: ${shouldLock}, isLocked: ${isLocked}`)
     
     // Reset current bet when round number changes (new round started)
     if (roundNumber !== lastResetRound) {
@@ -198,25 +206,37 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
     return () => window.removeEventListener("keydown", handleKeyPress)
   }, [isLocked, currentBet])
 
-  const handlePlaceBet = (direction: "up" | "down") => {
+  const handlePlaceBet = async (direction: "up" | "down") => {
     if (isLocked || currentBet.isActive || stake > balance) return
+    if (!connected) {
+      alert('Please connect your wallet to place bets')
+      return
+    }
 
     console.log(`[BET PLACED] Direction: ${direction}, Stake: ${stake}, isLocked: ${isLocked}, currentBet.isActive: ${currentBet.isActive}, balance: ${balance}`)
 
-    setCurrentBet({
-      direction,
-      stake,
-      entryPrice: null, // Will be set when entry price is captured
-      exitPrice: null,
-      payout: 0,
-      multiplier: 0,
-      isActive: true,
-    })
+    try {
+      // Place bet on blockchain
+      const txHash = await placeBet(stake, direction)
+      setTransactionHash(txHash)
+      
+      setCurrentBet({
+        direction,
+        stake,
+        entryPrice: null, // Will be set when entry price is captured
+        exitPrice: null,
+        payout: 0,
+        multiplier: 0,
+        isActive: true,
+      })
 
-    setBalance((prev) => prev - stake)
+      setBalance((prev) => prev - stake)
 
-    // Play UI beep sound (would be implemented with audio)
-    console.log(`[BET] BET PLACED: ${direction.toUpperCase()} - Waiting for entry price`)
+      console.log(`[BET] BET PLACED: ${direction.toUpperCase()} - Transaction: ${txHash}`)
+    } catch (error) {
+      console.error('Failed to place bet:', error)
+      alert(`Failed to place bet: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
   }
 
   const handleCancelBet = () => {
@@ -245,6 +265,9 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
           <div className="text-xs" style={{ color: "var(--color-text-dim)" }}>
             Phase: {roundPhase === 'waiting' ? '🎯 BETTING OPEN' : '⏳ WAITING FOR RESULTS'}
           </div>
+          <div className="text-xs font-bold" style={{ color: isLocked ? "var(--color-accent-down)" : "var(--color-accent-up)" }}>
+            {isLocked ? '🔒 LOCKED' : '✅ READY TO BET'} {!connected && '(Connect Wallet)'}
+          </div>
           {entryPrice && roundPhase === 'betting' && (
             <div className="text-xs" style={{ color: "var(--color-text-dim)" }}>
               Entry Price: ${entryPrice.toFixed(2)}
@@ -253,7 +276,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
         </div>
         <div className="text-right">
           <div className="text-sm font-bold terminal-glow">
-            Balance: ${balance.toLocaleString()}
+            Balance: {balance.toLocaleString()} SOL
           </div>
         </div>
       </div>
@@ -263,7 +286,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
         <div className="grid grid-cols-2 gap-3">
           <Button
             onClick={() => handlePlaceBet("up")}
-            disabled={isLocked || currentBet.isActive || stake > balance}
+            disabled={isLocked || currentBet.isActive || stake > balance || !connected || isBettingLoading}
             className={`keycap-button h-10 font-bold text-base flex items-center justify-center gap-2 ${
               currentBet.direction === "up"
                 ? "bg-[var(--color-accent-up)] text-[var(--color-bg)] border-[var(--color-accent-up)]"
@@ -280,11 +303,11 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
                 }),
             }}
           >
-            {isLocked ? "LOCKED" : "▲ UP"}
+            {isBettingLoading ? "PROCESSING..." : isLocked ? "LOCKED" : !connected ? "CONNECT WALLET" : "▲ UP"}
           </Button>
           <Button
             onClick={() => handlePlaceBet("down")}
-            disabled={isLocked || currentBet.isActive || stake > balance}
+            disabled={isLocked || currentBet.isActive || stake > balance || !connected || isBettingLoading}
             className={`keycap-button h-10 font-bold text-base flex items-center justify-center gap-2 ${
               currentBet.direction === "down"
                 ? "bg-[var(--color-accent-down)] text-[var(--color-bg)] border-[var(--color-accent-down)]"
@@ -301,7 +324,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
                 }),
             }}
           >
-            {isLocked ? "LOCKED" : "▼ DOWN"}
+            {isBettingLoading ? "PROCESSING..." : isLocked ? "LOCKED" : !connected ? "CONNECT WALLET" : "▼ DOWN"}
           </Button>
         </div>
 
@@ -452,7 +475,7 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
             </div>
             <div>
               <span style={{ color: "var(--color-text-dim)" }}>Stake:</span>
-              <div className="font-bold">{currentBet.stake.toLocaleString()} $Prediction</div>
+              <div className="font-bold">{currentBet.stake.toLocaleString()} SOL</div>
             </div>
             <div>
               <span style={{ color: "var(--color-text-dim)" }}>Status:</span>
@@ -460,7 +483,23 @@ export default function BettingPanel({ roundTimeLeft, roundPhase, roundNumber, e
                 PENDING
               </div>
             </div>
+            {transactionHash && (
+              <div>
+                <span style={{ color: "var(--color-text-dim)" }}>Transaction:</span>
+                <div className="font-bold text-xs break-all" style={{ color: "var(--color-accent-info)" }}>
+                  {transactionHash.slice(0, 8)}...{transactionHash.slice(-8)}
+                </div>
+              </div>
+            )}
           </div>
+        </div>
+      )}
+
+      {/* Error Display */}
+      {bettingError && (
+        <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded text-red-400 text-sm">
+          <div className="font-bold">Transaction Error:</div>
+          <div>{bettingError}</div>
         </div>
       )}
 

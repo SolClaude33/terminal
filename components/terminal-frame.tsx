@@ -8,6 +8,7 @@ import RoundHistory from "./round-history"
 import PublicBetsTable from "./public-bets-table"
 import Ticker from "./ticker"
 import AgeGateModal from "./age-gate-modal"
+import { WalletButton } from "./wallet-button"
 import { SolanaAPI } from "@/lib/solana-api"
 
 export default function TerminalFrame() {
@@ -248,6 +249,13 @@ export default function TerminalFrame() {
         betPrice={betPrice}
         roundHistory={roundHistory}
       />
+
+      {/* Wallet Connection */}
+      <div className="border-b border-border bg-background p-4">
+        <div className="container mx-auto flex justify-end">
+          <WalletButton />
+        </div>
+      </div>
 
       <main className="container mx-auto px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 mb-4">

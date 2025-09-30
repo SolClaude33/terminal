@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { IBM_Plex_Mono } from "next/font/google"
 import "./globals.css"
+import { WalletContextProvider } from "@/components/wallet-provider"
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -33,7 +34,11 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="shortcut icon" href="/favicon.ico" />
       </head>
-      <body className="font-mono bg-background text-foreground min-h-screen">{children}</body>
+      <body className="font-mono bg-background text-foreground min-h-screen">
+        <WalletContextProvider>
+          {children}
+        </WalletContextProvider>
+      </body>
     </html>
   )
 }
